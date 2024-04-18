@@ -7,7 +7,7 @@
 int main(void){
     pid_t pid;
     printf("[%d]:begin!\n", getpid());
-    fflush(NULL); //fei chang zhong yao!!!
+    fflush(NULL); //flush!!!
     pid = fork();
     if(pid < 0){
         perror("fork()");
