@@ -24,4 +24,5 @@ int main(void)
     printf("%f\n", (*cosine)(2.0));
     dlclose(handle);
     exit(0);
+    
 }
