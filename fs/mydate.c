@@ -36,7 +36,7 @@ int main(int argc, char **argv){
                         perror("fopen()");
                         fp = stdout;
                     }
-                }
+                }__KERNEL_STRICT_NAMES
                 break;
             case 'H':
                 if(strcmp(optarg, "12") == 0)
