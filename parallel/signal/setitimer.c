@@ -6,19 +6,16 @@
 #include <unistd.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/time.h>
 
+#define CPS        10
+#define BUFFERSIZE CPS
 
-#define CPS         10
-#define BUFFERSIZE  CPS
-#define BURST       100
-
-static volatile sig_atomic_t token = 0;
+static volatile int loop = 0;
 
 static void alrm_handler(int sig){
-    alarm(1);
-    token++;
-    if(token > BURST)
-        token = BURST;
+    //alarm(1);
+    loop = 1;
 }
 
 
@@ -27,7 +24,7 @@ int main(int argc, char **argv){
     int sfd, dfd = 1;
     int len, ret, pos;
     char buf[BUFFERSIZE];
-
+    struct itimerval itv;
 
     if(argc < 2){
         fprintf(stderr, "Usage....\n");
@@ -35,7 +32,15 @@ int main(int argc, char **argv){
     }
 
     signal(SIGALRM, alrm_handler);
-    alarm(1);
+    //alarm(1);
+    itv.it_interval.tv_sec = 1;
+    itv.it_interval.tv_usec = 0;
+    itv.it_value.tv_sec = 1;
+    itv.it_value.tv_usec = 0;
+    if(setitimer(ITIMER_REAL, &itv, NULL) < 0){
+        perror("setitimer()");
+        exit(1);
+    }
 
     do{
         sfd = open(argv[1], O_RDONLY);
@@ -50,9 +55,9 @@ int main(int argc, char **argv){
 
     while(1){
 
-        while(token <= 0)
+        while(!loop)
             pause();
-        token--;
+        loop = 0;
         while((len = read(sfd, buf, BUFFERSIZE)) < 0){
             if(len < 0){
                 if(errno == EINTR)
