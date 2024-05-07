@@ -3,14 +3,35 @@
 
 #define KEYPATH "/etc/services"
 #define KEYPROJ 'g'
-#define NAMESIZE 1024
+#define PATHSIZE 1024
+#define DATASIZE 1024
 
-struct msg_st{
-    long type;
-    char name[NAMESIZE];
-    int math;
-    int chinese;
+enum{
+    MSG_PATH = 1,
+    MSG_DATA,
+    MSG_EOT
 };
 
+typedef struct msg_path_st{
+    long mtype;
+    char path[PATHSIZE];
+}msg_path_t;
+
+typedef struct msg_data_st{
+    long mtype;
+    char data[DATASIZE];
+    int datalen;
+}msg_data_t;
+
+
+typedef struct msg_eot_st{
+    long mtype;
+}msg_eot_t;
+
+union msg_s2c_un{
+    long mtype;
+    msg_data_t datamsg;
+    msg_eot_t eotmsg;
+};
 
 #endif

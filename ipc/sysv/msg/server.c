@@ -1,40 +1,53 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <string.h>
 
-#include "proto.h"
+struct msg_st{
+    long type;
+    char name[40];
+    int math;
+    int chinese;
+};
 
-
-int main(void){
+int main(){
     key_t key;
     int msgid;
     struct msg_st rbuf;
-    key = ftok(KEYPATH, KEYPROJ);
-    if(key < 0){
-        perror("ftok()");
+    int running = 1;
+    key = ftok("/etc/services", 65);
+    if (key == -1) {
+        perror("ftok");
         exit(1);
     }
 
-    msgid = msgget(key, IPC_CREAT|0600);
-    if(msgid < 0){
-        perror("msgget()");
+    msgid = msgget(key, 0666 | IPC_CREAT);
+    if (msgid == -1) {
+        perror("msgget");
         exit(1);
     }
-
-    while(1){
-        if(msgrcv(msgid, &rbuf, sizeof(rbuf)-sizeof(long), 0, 0) < 0){
-            perror("masgrecv()");
-            break;
+    while (running) {
+        // 接收消息
+        if (msgrcv(msgid, &rbuf, sizeof(rbuf), rbuf.type, 0) == -1) {
+            perror("msgrcv");
+            exit(1);
         }
 
-        fprintf(stdout, "name: %s\n", rbuf.name);
-        fprintf(stdout, "chinese: %d\n", rbuf.chinese);
-        fprintf(stdout, "math: %d\n", rbuf.math);
-        fflush(NULL);
+        printf("name: %s\n", rbuf.name);
+        printf("chinese: %d\n", rbuf.chinese);
+        printf("math: %d\n", rbuf.math);
+
+        // 如果消息内容为"exit"，则停止接收
+        if (strcmp(rbuf.name, "exit") == 0)
+            running = 0;
     }
 
-    msgctl(key, IPC_RMID, 0);
+    if (msgctl(msgid, IPC_RMID, NULL) == -1) {
+        perror("msgctl");
+        exit(1);
+    }
+
     exit(0);
 }
