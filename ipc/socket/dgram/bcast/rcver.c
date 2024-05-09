@@ -16,18 +16,17 @@ int main(void){
     int sd;
     socklen_t raddr_len;
     struct sockaddr_in laddr, raddr;
-    struct msg_st *rbufp;
+    struct msg_st rbuf;
     char ipstr[IPSTRSIZE];
-
-    int size = sizeof(struct msg_st) + NAMESIZE;
-    rbufp = malloc(size);
-    if(rbufp == NULL){
-        perror("malloc()");
-        exit(1);
-    }
     sd = socket(AF_INET, SOCK_DGRAM, 0);
     if(sd < 0){
         perror("socket()");
+        exit(1);
+    }
+
+    int val = 1;
+    if(setsockopt(sd, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)) < 0){
+        perror("setsockopt()");
         exit(1);
     }
 
@@ -41,13 +40,13 @@ int main(void){
     /*!!!*/
     raddr_len = sizeof(raddr);
     while(1){
-        recvfrom(sd, rbufp, size, 0, (void *)&raddr, &raddr_len);
+        recvfrom(sd, &rbuf, sizeof(rbuf), 0, (void *)&raddr, &raddr_len);
 
         inet_ntop(AF_INET, &raddr.sin_addr, ipstr, IPSTRSIZE);
         printf("mesage form %s:%d\n", ipstr, ntohs(raddr.sin_port));
-        printf("name: %s\n", rbufp->name);
-        printf("math: %d\n", ntohl(rbufp->math));
-        printf("chinese: %d\n", ntohl(rbufp->chinese));
+        printf("name: %s\n", rbuf.name);
+        printf("math: %d\n", ntohl(rbuf.math));
+        printf("chinese: %d\n", ntohl(rbuf.chinese));
         fflush(NULL);
     }
 

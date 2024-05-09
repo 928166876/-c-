@@ -13,11 +13,23 @@
 int main(int argc, char **argv){
 
     int sd;
-    struct msg_st sbuf;
+    struct msg_st *sbufp;
     struct sockaddr_in raddr;
 
-    if(argc < 2){
+    if(argc < 3){
         fprintf(stderr, "Usage...\n");
+        exit(1);
+    }
+
+    if(strlen(argv[2]) > NAMESIZE){
+        fprintf(stderr, "out of namesize\n");
+        exit(1);
+    }
+
+    int size = sizeof(struct msg_st) + strlen(argv[2]);
+    sbufp = malloc(size);
+    if(sbufp == NULL){
+        perror("malloc()");
         exit(1);
     }
 
@@ -29,14 +41,14 @@ int main(int argc, char **argv){
 
 
     //bind();
-    strcpy(sbuf.name, "zhao");
-    sbuf.math = htonl(rand()%100);
-    sbuf.chinese = htonl(rand()%100);
+    strcpy(sbufp->name, argv[2]);
+    sbufp->math = htonl(rand()%100);
+    sbufp->chinese = htonl(rand()%100);
 
     raddr.sin_family = AF_INET;
     raddr.sin_port = htons(atoi(SERVERPORT));
     inet_pton(AF_INET, argv[1], &raddr.sin_addr);
-    if(sendto(sd, &sbuf, sizeof(sbuf), 0, (void *)&raddr, sizeof(raddr)) < 0){
+    if(sendto(sd, sbufp, size, 0, (void *)&raddr, sizeof(raddr)) < 0){
         perror("sendto()");
         exit(1);
     }
