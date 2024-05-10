@@ -22,7 +22,7 @@ struct at_job_st{
     int job_state;
     int sec;
     int time_remain;
-    //int repeat;
+    int repeat;
     at_jobfunc_t *jobp;
     void *arg;
 };
@@ -36,7 +36,10 @@ static void alrm_action(int s, siginfo_t *infop, void *unused){
             job[i]->time_remain--;
             if(job[i]->time_remain == 0){
                 job[i]->jobp(job[i]->arg);
-                job[i]->job_state = STATE_OVER;
+                if(job[i]->repeat == 1)
+                    job[i]->time_remain = job[i]->sec;
+                else
+                    job[i]->job_state = STATE_OVER;
             }
         }
     }
@@ -98,6 +101,9 @@ static int get_free_pos(void){
 int at_addjob(int sec, at_jobfunc_t *jobp, void *arg){
     int pos;
     struct at_job_st *me;
+    if(sec < 0){
+        return -EINVAL;
+    }
 
     if(!inited){
         module_load();
@@ -117,11 +123,36 @@ int at_addjob(int sec, at_jobfunc_t *jobp, void *arg){
     me->time_remain = me->sec;
     me->jobp = jobp;
     me->arg = arg;
-
+    me->repeat = 0;
     job[pos] = me;
     return pos;
 }
 
+int at_addjob_repeat(int sec, at_jobfunc_t *jobp, void *arg){
+    int pos;
+    struct at_job_st *me;
+    if(sec < 0){
+        return -EINVAL;
+    }   
+    if(!inited){
+        module_load();
+        inited = 1;
+    }
+    pos = get_free_pos();
+    if(pos < 0){
+        return -ENOSPC;
+    }
+   
+    me->job_state = STATE_RUNNING;
+    me->sec = sec;
+    me->time_remain = me->sec;
+    me->jobp = jobp;
+    me->arg = arg;
+    me->repeat = 1;
+
+    job[pos] = me;
+    return pos;
+}
 
 
 int at_canceljob(int id){
@@ -141,6 +172,9 @@ int at_waitjob(int id){
     if(id < 0 || id >= JOB_MAX || job[id] == NULL)
         return -EINVAL;
     
+    if(job[id]->repeat == 1)
+        return -EBUSY;
+
     while(job[id]->job_state == STATE_RUNNING)
         pause();
     if(job[id]->job_state == STATE_CANCELED || job[id]->job_state == STATE_OVER){

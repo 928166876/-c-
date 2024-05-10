@@ -13,7 +13,13 @@ int at_addjob(int sec, at_jobfunc_t *jobp, void *arg);
             ==-ENOMEM   失败， 内存空间不足
 */
 
-//st_addjob_repeat(int, at_jobfunc_t *, void *)
+int at_addjob_repeat(int sec, at_jobfunc_t *jobp, void *arg);
+/*
+    return  >= 0        成功， 返回任务id
+            ==-EINVAL   失败， 参数非法
+            ==-ENOSPC   失败， 数组满
+            ==-ENOMEM   失败， 内存空间不足
+*/
 
 int at_canceljob(int id);
 /*
