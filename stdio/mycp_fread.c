@@ -27,9 +27,9 @@ int main(int argc, char** argv){
     }
 
     //int res = 0;
-    while (n = fread(buf, 1, BUFFERSIZE, fps)){
-        printf("%d\n", n);
-        fwrite(buf, 1, n, fpd);
+    while (n = fread(buf, 1, BUFFERSIZE, fps)){     //读取数据,相当于fgetc()
+        printf("%d\n", n);              //！！！注意n值！！！
+        fwrite(buf, 1, n, fpd);         //写入数据,相当于fputc()
     }
 
     fclose(fps);

@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-static int ftype(const char *fname){
+static int ftype(const char *fname){    //根据文件名或路径名返回其类型
     struct stat statres;
     if(stat(fname, &statres) < 0){
         perror("stat()");
@@ -22,7 +22,7 @@ static int ftype(const char *fname){
 
 int main(int argc, char **argv){
 
-    int res = ftype(argv[1]);
+    int res = ftype(argv[1]);   
     printf("%c\n", res);
     exit(0);
 }

@@ -6,7 +6,7 @@
 
 static off_t flen(const char *fname){
     struct stat statres;
-    if(stat(fname, &statres) < 0){
+    if(stat(fname, &statres) < 0){  //给文件名或路径名，它给你回填结构体
         perror("stat()");
         exit(1);
     }

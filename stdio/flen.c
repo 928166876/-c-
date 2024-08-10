@@ -16,8 +16,8 @@ int main(int argc, char** argv){
         perror("fopen()");
         exit(1);
     }
-    fseek(fp, 0, SEEK_END);
-    printf("%ld\n", ftell(fp));
+    fseek(fp, 0, SEEK_END);     //将文件指针移动到文件末尾
+    printf("%ld\n", ftell(fp)); //输出文件指针的位置
 /*
     while(fgetc(fp) != EOF){
         count++;

@@ -14,26 +14,27 @@ int main(int argc, char **argv){
 
     int sfd, dfd;
     int len, ret, pos;
-    char buf[BUFFERSIZE];
+    char buf[BUFFERSIZE];  //定义一个缓冲区
 
 
-    if(argc < 3){
+    if(argc < 3){  //判断参数个数
         fprintf(stderr, "Usage....\n");
         exit(1);
     }
-
 
     sfd = open(argv[1], O_RDONLY);
     if(sfd < 0){
         perror("open()");
         exit(1);
     }
+
     dfd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC, 0600);
     if(dfd < 0){
         close(sfd);
         perror("open()");
         exit(1);
     }
+
     while(1){
         len = read(sfd, buf, BUFFERSIZE);
         if(len < 0){
@@ -42,7 +43,7 @@ int main(int argc, char **argv){
         }
         if(len == 0)
             break;
-
+            
         pos = 0;
         while(len > 0){
             ret = write(dfd, buf + pos, len);
@@ -53,7 +54,6 @@ int main(int argc, char **argv){
             pos += ret;
             len -= ret;
         }
-        
     }
 
     close(dfd);

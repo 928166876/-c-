@@ -16,11 +16,12 @@ int main(void){
         exit(1);
     }
     close(1);
-    dup(fd);    //操作不原子
+    dup(fd);    //操作不原子 将fd重定向到1  此时fd-> 打开的/tmp/out  1号文件描述符 -> 打开的/tmp/out
     close(fd);
 
 
     /*==============================*/
     puts("hello,world!");
+    // puts("test dup!");
     exit(0);
 }

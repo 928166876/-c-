@@ -6,7 +6,7 @@ static jmp_buf save;
 
 static void d(void){
     printf("%s begin!\n", __FUNCTION__);
-    longjmp(save, 6);
+    longjmp(save, 0);   //开始往回跳， 返回值为6,值为0会被系统修改
     printf("%s end!\n", __FUNCTION__);
 }
 
@@ -23,13 +23,13 @@ static void b(void){
 }
 
 static void a(void){
-    int ret = setjmp(save);
-    if(ret == 0){
+    int ret = setjmp(save); //设置跳转点，安全跳转
+    if(ret == 0){           
         printf("%s begin!\n", __FUNCTION__);
         b();
         printf("%s end!\n", __FUNCTION__);
     }else{
-        printf("code %d return\n", ret);
+        printf("code %d return\n", ret);  
     }
 }
 
