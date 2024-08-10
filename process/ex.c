@@ -5,8 +5,8 @@
 int main(void)
 {
     puts("begin.");
-    fflush(NULL);
-    execl("/bin/date", "date", "+%s", NULL);
+    fflush(NULL);       
+    execl("/bin/date", "date", "+%s", NULL);    //exec函数组，替换当前进程执行内容
     perror("execl()");
     exit(1);
 

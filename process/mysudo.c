@@ -9,7 +9,7 @@
 int main(int argc, char **argv)
 {
     pid_t pid;
-    if(argc < 3)
+    if(argc < 3)    //  传参数个数判断
     {
         fprintf(stderr, "Usage...\n");
         exit(1);
@@ -23,8 +23,8 @@ int main(int argc, char **argv)
     }
     if(pid == 0)
     {
-        setuid(atoi(argv[1]));
-        execvp(argv[2], argv+2);
+        setuid(atoi(argv[1]));  //setuid将当前设置为0号用户
+        execvp(argv[2], argv+2);    //第一个参数是要执行的命令名， 第二参数是命令名+内容
         perror("execvp()");
         exit(1);
     }

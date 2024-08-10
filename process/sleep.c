@@ -18,7 +18,7 @@ int main(void)
     }
     if(pid == 0)
     {
-        execl("/bin/sleep", "httpd", "100", NULL);
+        execl("/bin/sleep", "httpd", "100", NULL);  //并不关心叫什么名字可以是sleep或者httpd
         perror("execl()");
         exit(1);
     }
